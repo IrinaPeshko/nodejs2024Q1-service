@@ -22,13 +22,13 @@ export class UserService {
       );
     }
     const newUser = new User();
-    (newUser.id = uuidv4()),
-      (newUser.login = login),
-      (newUser.password = password);
-    (newUser.version = 1),
-      (newUser.createdAt = Date.now()),
-      (newUser.updatedAt = Date.now()),
-      this.users.push(newUser);
+    newUser.id = uuidv4();
+    newUser.login = login;
+    newUser.password = password;
+    newUser.version = 1;
+    newUser.createdAt = Date.now();
+    newUser.updatedAt = Date.now();
+    this.users.push(newUser);
     return newUser;
   }
 
@@ -37,10 +37,11 @@ export class UserService {
   }
 
   findOne(id: string) {
-    if (!uuidValidate(id))
+    if (!uuidValidate(id)) {
       throw new BadRequestException(
         'Invalid userId provided. Please provide a valid UUID.',
       );
+    }
     const user = this.users.find((user) => user.id === id);
     if (!user)
       throw new NotFoundException('User with the provided id does not exist.');
@@ -55,7 +56,13 @@ export class UserService {
         'Old password is incorrect. Please provide the correct old password.',
       );
     }
-    const updatedUser: IUser = { ...user, password: updateUserDto.newPassword };
+
+    const updatedUser: IUser = {
+      ...user,
+      password: updateUserDto.newPassword,
+      version: user.version + 1,
+      updatedAt: Date.now(),
+    };
     this.users[updatedUserIndex] = updatedUser;
     return updatedUser;
   }
