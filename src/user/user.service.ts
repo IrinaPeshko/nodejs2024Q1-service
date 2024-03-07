@@ -1,26 +1,80 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/user.entity';
+import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
+import { IUser } from 'src/types/apiTypes';
 
 @Injectable()
 export class UserService {
+  private users: IUser[] = [];
+
   create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+    const { login, password } = createUserDto;
+    if (!login || !password) {
+      throw new BadRequestException(
+        'Missing required fields. Please ensure all required fields are provided',
+      );
+    }
+    const newUser = new User();
+    (newUser.id = uuidv4()),
+      (newUser.login = login),
+      (newUser.password = password);
+    (newUser.version = 1),
+      (newUser.createdAt = Date.now()),
+      (newUser.updatedAt = Date.now()),
+      this.users.push(newUser);
+    return newUser;
   }
 
   findAll() {
-    return `This action returns all user`;
+    return this.users;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  findOne(id: string) {
+    if (!uuidValidate(id))
+      throw new BadRequestException(
+        'Invalid userId provided. Please provide a valid UUID.',
+      );
+    const user = this.users.find((user) => user.id === id);
+    if (!user)
+      throw new NotFoundException('User with the provided id does not exist.');
+    return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  update(id: string, updateUserDto: UpdateUserDto) {
+    const updatedUserIndex = this.findUserId(id);
+    const user = this.users[updatedUserIndex];
+    if (user.password !== updateUserDto.oldPassword) {
+      throw new ForbiddenException(
+        'Old password is incorrect. Please provide the correct old password.',
+      );
+    }
+    const updatedUser: IUser = { ...user, password: updateUserDto.newPassword };
+    this.users[updatedUserIndex] = updatedUser;
+    return updatedUser;
   }
 
-  remove(id: number) {
+  remove(id: string) {
+    const userIndex = this.findUserId(id);
+    this.users.splice(userIndex, 1);
     return `This action removes a #${id} user`;
+  }
+
+  private findUserId(id: string) {
+    if (!uuidValidate(id)) {
+      throw new BadRequestException(
+        'Invalid userId provided. Please provide a valid UUID.',
+      );
+    }
+    const userIndex = this.users.findIndex((user) => user.id === id);
+    if (userIndex === -1)
+      throw new NotFoundException('User with the provided id does not exist.');
+    return userIndex;
   }
 }
