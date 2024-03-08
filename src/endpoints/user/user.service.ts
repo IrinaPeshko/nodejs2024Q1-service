@@ -49,9 +49,15 @@ export class UserService {
   }
 
   update(id: string, updateUserDto: UpdateUserDto) {
+    const { oldPassword, newPassword } = updateUserDto;
+    if (!oldPassword || !newPassword) {
+      throw new BadRequestException(
+        'Invalid oldPassword or newPassword provided. Please provide a valid fields.',
+      );
+    }
     const updatedUserIndex = this.findUserId(id);
     const user = this.users[updatedUserIndex];
-    if (user.password !== updateUserDto.oldPassword) {
+    if (user.password !== oldPassword) {
       throw new ForbiddenException(
         'Old password is incorrect. Please provide the correct old password.',
       );
