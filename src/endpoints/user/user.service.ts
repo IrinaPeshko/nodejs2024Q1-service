@@ -28,7 +28,9 @@ export class UserService {
     newUser.createdAt = Date.now();
     newUser.updatedAt = Date.now();
     this.users.push(newUser);
-    return newUser;
+    const response = { ...newUser };
+    delete response.password;
+    return response;
   }
 
   findAll() {
@@ -69,7 +71,9 @@ export class UserService {
       updatedAt: Date.now(),
     };
     this.users[updatedUserIndex] = updatedUser;
-    return updatedUser;
+    const response = { ...updatedUser };
+    delete response.password;
+    return response;
   }
 
   remove(id: string) {
