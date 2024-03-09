@@ -10,12 +10,18 @@ import { UpdateArtistDto } from './dto/update-artist.dto';
 import { Artist } from './entities/artist.entity';
 import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
 import { FavsService } from '../favs/favs.service';
+import { TrackService } from '../track/track.service';
+import { AlbumService } from '../album/album.service';
 
 @Injectable()
 export class ArtistService {
-  constructor (
+  constructor(
     @Inject(forwardRef(() => FavsService))
     private favsService: FavsService,
+    @Inject(forwardRef(() => TrackService))
+    private trackService: TrackService,
+    @Inject(forwardRef(() => AlbumService))
+    private albumSevice: TrackService,
   ) {}
   private artists: Artist[] = [];
   create(createArtistDto: CreateArtistDto) {
@@ -73,7 +79,9 @@ export class ArtistService {
 
   remove(id: string) {
     const artistIndex = this.findIndex(id);
-    this.favsService.removeArtist(id)
+    this.favsService.removeArtist(id);
+    this.trackService.removeArtistId(id);
+    this.albumSevice.removeArtistId(id);
     this.artists.splice(artistIndex, 1);
     return `This action removes a #${id} artist`;
   }

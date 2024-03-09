@@ -13,7 +13,7 @@ import { FavsService } from '../favs/favs.service';
 
 @Injectable()
 export class TrackService {
-  constructor (
+  constructor(
     @Inject(forwardRef(() => FavsService))
     private favsService: FavsService,
   ) {}
@@ -65,7 +65,7 @@ export class TrackService {
     const updatedTrack: Track = {
       ...track,
       name: name ? name : track.name,
-      artistId: artistId ? artistId : track.artistId,
+      artistId: artistId !== undefined ? artistId : track.artistId,
       albumId: albumId ? albumId : track.albumId,
       duration: duration ? duration : track.duration,
     };
@@ -73,9 +73,27 @@ export class TrackService {
     return updatedTrack;
   }
 
+  removeArtistId(artistId: string) {
+    const tracksWithArtist = this.tracks.filter(
+      (track) => track.artistId === artistId,
+    );
+    tracksWithArtist.map((track) => {
+      const updateTrackIndex = this.findIndex(track.id);
+      this.tracks[updateTrackIndex] = { ...track, artistId: null };
+    });
+  }
+  removeAlbumId(albumId: string) {
+    const tracksWithAlbum = this.tracks.filter(
+      (track) => track.albumId === albumId,
+    );
+    tracksWithAlbum.map((track) => {
+      const updateTrackIndex = this.findIndex(track.id);
+      this.tracks[updateTrackIndex] = { ...track, albumId: null };
+    });
+  }
   remove(id: string) {
     const trackIndex = this.findIndex(id);
-    this.favsService.removeArtist(id)
+    this.favsService.removeArtist(id);
     this.tracks.splice(trackIndex, 1);
     return `This action removes a #${id} track`;
   }

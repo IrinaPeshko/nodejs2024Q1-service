@@ -10,12 +10,15 @@ import { UpdateAlbumDto } from './dto/update-album.dto';
 import { Album } from './entities/album.entity';
 import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
 import { FavsService } from '../favs/favs.service';
+import { TrackService } from '../track/track.service';
 
 @Injectable()
 export class AlbumService {
-  constructor (
+  constructor(
     @Inject(forwardRef(() => FavsService))
     private favsService: FavsService,
+    @Inject(forwardRef(() => TrackService))
+    private trackService: TrackService,
   ) {}
   private albums: Album[] = [];
   create(createAlbumDto: CreateAlbumDto) {
@@ -83,9 +86,20 @@ export class AlbumService {
     return updatedAlbum;
   }
 
+  removeArtistId(artistId: string) {
+    const albumsWithArtist = this.albums.filter(
+      (album) => album.artistId === artistId,
+    );
+    albumsWithArtist.map((album) => {
+      const updateAlbumIndex = this.findIndex(album.id);
+      this.albums[updateAlbumIndex] = { ...album, artistId: null };
+    });
+  }
+
   remove(id: string) {
     const albumIndex = this.findIndex(id);
-    this.favsService.removeAlbum(id)
+    this.favsService.removeAlbum(id);
+    this.trackService.removeAlbumId(id);
     this.albums.splice(albumIndex, 1);
     return `This action removes a #${id} album`;
   }

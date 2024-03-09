@@ -13,7 +13,7 @@ import { ArtistService } from '../artist/artist.service';
 
 @Injectable()
 export class FavsService {
-  constructor(    
+  constructor(
     @Inject(forwardRef(() => TrackService))
     private trackService: TrackService,
 
@@ -21,7 +21,7 @@ export class FavsService {
     private artistService: ArtistService,
 
     @Inject(forwardRef(() => AlbumService))
-    private albumService: AlbumService
+    private albumService: AlbumService,
   ) {}
   private readonly favorites = {
     tracks: [] as string[],
@@ -117,7 +117,9 @@ export class FavsService {
   }
 
   removeArtist(artistId: string, mode?: string): string {
-    const index = this.favorites.artists.findIndex(artist => artist === artistId);
+    const index = this.favorites.artists.findIndex(
+      (artist) => artist === artistId,
+    );
     if (index === -1) {
       if (mode === 'fav') {
         throw new NotFoundException('Artist is not in favorites.');
