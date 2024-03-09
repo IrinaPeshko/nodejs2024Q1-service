@@ -58,16 +58,16 @@ export class ArtistService {
     const updatedArtist: Artist = {
       ...artist,
       name: name ? name : artist.name,
-      grammy: grammy,
+      grammy: grammy ? grammy : false,
     };
     this.artists[updateArtistIndex] = updatedArtist;
     return updatedArtist;
   }
 
   remove(id: string) {
-    const trackIndex = this.findIndex(id);
-    this.artists.splice(trackIndex, 1);
-    return `This action removes a #${id} track`;
+    const albumIndex = this.findIndex(id);
+    this.artists.splice(albumIndex, 1);
+    return `This action removes a #${id} album`;
   }
 
   private findIndex(id: string) {
