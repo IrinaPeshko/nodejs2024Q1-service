@@ -95,7 +95,7 @@ export class TrackService {
     const trackIndex = this.findIndex(id);
     this.favsService.removeArtist(id);
     this.tracks.splice(trackIndex, 1);
-    return `This action removes a #${id} track`;
+    return `Delelted successfully`;
   }
 
   private findIndex(id: string) {

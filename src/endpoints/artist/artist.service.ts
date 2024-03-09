@@ -83,7 +83,7 @@ export class ArtistService {
     this.trackService.removeArtistId(id);
     this.albumSevice.removeArtistId(id);
     this.artists.splice(artistIndex, 1);
-    return `This action removes a #${id} artist`;
+    return `Delelted successfully`;
   }
 
   private findIndex(id: string) {

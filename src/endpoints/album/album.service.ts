@@ -101,7 +101,7 @@ export class AlbumService {
     this.favsService.removeAlbum(id);
     this.trackService.removeAlbumId(id);
     this.albums.splice(albumIndex, 1);
-    return `This action removes a #${id} album`;
+    return `Deleted successfully`;
   }
 
   private findIndex(id: string) {

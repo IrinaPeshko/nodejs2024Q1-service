@@ -99,7 +99,7 @@ export class FavsService {
     }
 
     this.favorites.tracks.splice(index, 1);
-    return 'Track removed from favorites.';
+    return 'Deleted successfully';
   }
 
   removeAlbum(albumId: string, mode?: string): string {
@@ -113,7 +113,7 @@ export class FavsService {
     }
 
     this.favorites.albums.splice(index, 1);
-    return 'Album removed from favorites.';
+    return 'Deleted successfully';
   }
 
   removeArtist(artistId: string, mode?: string): string {
@@ -128,6 +128,6 @@ export class FavsService {
       }
     }
     this.favorites.artists.splice(index, 1);
-    return 'Artist removed from favorites.';
+    return 'Deleted successfully';
   }
 }

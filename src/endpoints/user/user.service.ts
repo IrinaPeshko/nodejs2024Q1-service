@@ -34,7 +34,12 @@ export class UserService {
   }
 
   findAll() {
-    return this.users;
+    const users = this.users.map((user) => {
+      const response = { ...user };
+      delete response.password;
+      return response;
+    });
+    return users;
   }
 
   findOne(id: string) {
