@@ -8,11 +8,10 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
-import { IUser } from 'src/types/apiTypes';
 
 @Injectable()
 export class UserService {
-  private users: IUser[] = [];
+  private users: User[] = [];
 
   create(createUserDto: CreateUserDto) {
     const { login, password } = createUserDto;
@@ -63,7 +62,7 @@ export class UserService {
       );
     }
 
-    const updatedUser: IUser = {
+    const updatedUser: User = {
       ...user,
       password: updateUserDto.newPassword,
       version: user.version + 1,
