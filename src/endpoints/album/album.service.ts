@@ -1,15 +1,22 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { Album } from './entities/album.entity';
 import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
+import { FavsService } from '../favs/favs.service';
 
 @Injectable()
 export class AlbumService {
+  constructor (
+    @Inject(forwardRef(() => FavsService))
+    private favsService: FavsService,
+  ) {}
   private albums: Album[] = [];
   create(createAlbumDto: CreateAlbumDto) {
     const { name, year, artistId } = createAlbumDto;
@@ -78,6 +85,7 @@ export class AlbumService {
 
   remove(id: string) {
     const albumIndex = this.findIndex(id);
+    this.favsService.removeAlbum(id)
     this.albums.splice(albumIndex, 1);
     return `This action removes a #${id} album`;
   }
@@ -88,6 +96,7 @@ export class AlbumService {
         'Invalid albumId provided. Please provide a valid UUID.',
       );
     }
+
     const albumIndex = this.albums.findIndex((album) => album.id === id);
     if (albumIndex === -1)
       throw new NotFoundException('Album with the provided id does not exist.');

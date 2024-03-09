@@ -1,8 +1,10 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
   UnprocessableEntityException,
+  forwardRef,
 } from '@nestjs/common';
 import { validate as uuidValidate } from 'uuid';
 import { TrackService } from '../track/track.service';
@@ -11,10 +13,15 @@ import { ArtistService } from '../artist/artist.service';
 
 @Injectable()
 export class FavsService {
-  constructor(
-    private readonly trackService: TrackService,
-    private readonly albumService: AlbumService,
-    private readonly artistService: ArtistService,
+  constructor(    
+    @Inject(forwardRef(() => TrackService))
+    private trackService: TrackService,
+
+    @Inject(forwardRef(() => ArtistService))
+    private artistService: ArtistService,
+
+    @Inject(forwardRef(() => AlbumService))
+    private albumService: AlbumService
   ) {}
   private readonly favorites = {
     tracks: [] as string[],
@@ -51,7 +58,6 @@ export class FavsService {
       throw new BadRequestException('Artist already in favorites.');
     }
     this.favorites.artists.push(newArtist.id);
-    console.log(newArtist);
     return newArtist;
   }
 
@@ -82,32 +88,43 @@ export class FavsService {
     };
   }
 
-  removeTrack(trackId: string): string {
+  removeTrack(trackId: string, mode?: string): string {
     const index = this.favorites.tracks.indexOf(trackId);
     if (index === -1) {
-      throw new NotFoundException('Track is not in favorites.');
+      if (mode === 'fav') {
+        throw new NotFoundException('Track is not in favorites.');
+      } else {
+        return;
+      }
     }
 
     this.favorites.tracks.splice(index, 1);
     return 'Track removed from favorites.';
   }
 
-  removeAlbum(albumId: string): string {
+  removeAlbum(albumId: string, mode?: string): string {
     const index = this.favorites.albums.indexOf(albumId);
     if (index === -1) {
-      throw new NotFoundException('Album is not in favorites.');
+      if (mode === 'fav') {
+        throw new NotFoundException('Album is not in favorites.');
+      } else {
+        return;
+      }
     }
 
     this.favorites.albums.splice(index, 1);
     return 'Album removed from favorites.';
   }
 
-  removeArtist(artistId: string): string {
-    const index = this.favorites.artists.indexOf(artistId);
+  removeArtist(artistId: string, mode?: string): string {
+    const index = this.favorites.artists.findIndex(artist => artist === artistId);
     if (index === -1) {
-      throw new NotFoundException('Artist is not in favorites.');
+      if (mode === 'fav') {
+        throw new NotFoundException('Artist is not in favorites.');
+      } else {
+        return;
+      }
     }
-
     this.favorites.artists.splice(index, 1);
     return 'Artist removed from favorites.';
   }

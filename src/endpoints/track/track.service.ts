@@ -1,15 +1,22 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { Track } from './entities/track.entity';
 import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
+import { FavsService } from '../favs/favs.service';
 
 @Injectable()
 export class TrackService {
+  constructor (
+    @Inject(forwardRef(() => FavsService))
+    private favsService: FavsService,
+  ) {}
   private tracks: Track[] = [];
   create(createTrackDto: CreateTrackDto) {
     const { duration, name, artistId, albumId } = createTrackDto;
@@ -68,6 +75,7 @@ export class TrackService {
 
   remove(id: string) {
     const trackIndex = this.findIndex(id);
+    this.favsService.removeArtist(id)
     this.tracks.splice(trackIndex, 1);
     return `This action removes a #${id} track`;
   }

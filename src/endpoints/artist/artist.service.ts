@@ -1,15 +1,22 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { Artist } from './entities/artist.entity';
 import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
+import { FavsService } from '../favs/favs.service';
 
 @Injectable()
 export class ArtistService {
+  constructor (
+    @Inject(forwardRef(() => FavsService))
+    private favsService: FavsService,
+  ) {}
   private artists: Artist[] = [];
   create(createArtistDto: CreateArtistDto) {
     const { name, grammy } = createArtistDto;
@@ -65,9 +72,10 @@ export class ArtistService {
   }
 
   remove(id: string) {
-    const albumIndex = this.findIndex(id);
-    this.artists.splice(albumIndex, 1);
-    return `This action removes a #${id} album`;
+    const artistIndex = this.findIndex(id);
+    this.favsService.removeArtist(id)
+    this.artists.splice(artistIndex, 1);
+    return `This action removes a #${id} artist`;
   }
 
   private findIndex(id: string) {
