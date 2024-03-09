@@ -34,13 +34,13 @@ export class FavsController {
     return this.favsService.removeTrack(id, 'fav');
   }
 
-  @Delete('/track/:id')
+  @Delete('/album/:id')
   @HttpCode(204)
   removeAlbum(@Param('id') id: string) {
     return this.favsService.removeAlbum(id, 'fav');
   }
 
-  @Delete('/track/:id')
+  @Delete('/artist/:id')
   @HttpCode(204)
   removeArtist(@Param('id') id: string) {
     return this.favsService.removeArtist(id, 'fav');
