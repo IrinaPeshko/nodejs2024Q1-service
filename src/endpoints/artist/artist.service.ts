@@ -83,4 +83,8 @@ export class ArtistService {
       );
     return artistIndex;
   }
+
+  filterByIds(ids: string[]) {
+    return this.artists.filter((artist) => ids.includes(artist.id));
+  }
 }

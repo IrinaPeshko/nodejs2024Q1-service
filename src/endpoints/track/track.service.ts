@@ -83,4 +83,8 @@ export class TrackService {
       throw new NotFoundException('Track with the provided id does not exist.');
     return trackIndex;
   }
+
+  filterByIds(ids: string[]) {
+    return this.tracks.filter((track) => ids.includes(track.id));
+  }
 }

@@ -1,7 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Param, Delete, HttpCode } from '@nestjs/common';
 import { FavsService } from './favs.service';
-import { CreateFavDto } from './dto/create-fav.dto';
-import { UpdateFavDto } from './dto/update-fav.dto';
 
 @Controller('favs')
 export class FavsController {
@@ -10,20 +8,20 @@ export class FavsController {
   @Post('/track/:id')
   @HttpCode(201)
   addTrackToFavorites(@Param('id') id: string) {
-  return this.favsService.addTrack(id);
-}
+    return this.favsService.addTrack(id);
+  }
 
-@Post('/artist/:id')
-@HttpCode(201)
+  @Post('/artist/:id')
+  @HttpCode(201)
   addArtistToFavorites(@Param('id') id: string) {
-  return this.favsService.addArtist(id);
-}
+    return this.favsService.addArtist(id);
+  }
 
-@Post('/album/:id')
-@HttpCode(201)
+  @Post('/album/:id')
+  @HttpCode(201)
   addAlbumToFavorites(@Param('id') id: string) {
-  return this.favsService.addAlbum(id);
-}
+    return this.favsService.addAlbum(id);
+  }
 
   @Get()
   findAll() {

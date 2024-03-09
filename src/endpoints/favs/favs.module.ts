@@ -8,6 +8,6 @@ import { AlbumModule } from 'src/endpoints/album/album.module';
 @Module({
   imports: [TrackModule, ArtistModule, AlbumModule],
   controllers: [FavsController],
-  providers: [FavsService]
+  providers: [FavsService],
 })
 export class FavsModule {}

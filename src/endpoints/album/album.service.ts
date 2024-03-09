@@ -93,4 +93,7 @@ export class AlbumService {
       throw new NotFoundException('Album with the provided id does not exist.');
     return albumIndex;
   }
+  filterByIds(ids: string[]) {
+    return this.albums.filter((album) => ids.includes(album.id));
+  }
 }
