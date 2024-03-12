@@ -70,3 +70,19 @@ npm run format
 Press <kbd>F5</kbd> to debug.
 
 For more information, visit: https://code.visualstudio.com/docs/editor/debugging
+
+## Additional Setup Instructions
+
+### Creating `.env` File
+Before running the application, ensure you have a `.env` file set up in your project root. You can create this file by copying the `.env.example` provided in the repository and modifying it to suit your environment.
+
+### Running Tests in a Separate Terminal
+Tests are an essential part of this application. To run tests while the application is running, open a new terminal window and execute the test commands. This allows you to run tests without interrupting the application's runtime.
+
+### OpenAPI Documentation
+The application is documented using OpenAPI. You can access the documentation by navigating to `http://localhost:4000/doc/` in your web browser after starting the application.
+
+### Debugging
+For debugging in Visual Studio Code, you can use the integrated debugger. Just press <kbd>F5</kbd> to start debugging.
+
+Remember to check the `package.json` file for other scripts that might be useful in development or production environments.
