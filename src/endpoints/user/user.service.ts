@@ -8,6 +8,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
+import { db } from 'src/services/db';
 
 @Injectable()
 export class UserService {
@@ -33,12 +34,13 @@ export class UserService {
     return response;
   }
 
-  findAll() {
-    const users = this.users.map((user) => {
-      const response = { ...user };
-      delete response.password;
-      return response;
-    });
+  async findAll() {
+    const users = await db.user.findMany();
+    // const users = this.users.map((user) => {
+    //   const response = { ...user };
+    //   delete response.password;
+    //   return response;
+    // });
     return users;
   }
 
