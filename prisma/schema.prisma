@@ -22,17 +22,17 @@ model User {
   updatedAt DateTime @default(now()) @updatedAt
 }
 
-// model Album {
-//   id        String   @id @default(uuid())
-//   name      String
-//   year      Int
-//   artistId  String?  @map("artist_id")
-//   artist    Artist?  @relation(fields: [artistId], references: [id])
-// }
+model Album {
+  id        String   @id @default(uuid())
+  name      String
+  year      Int
+  artistId  String?  @map("artist_id")
+  artist    Artist?  @relation(fields: [artistId], references: [id])
+}
 
 model Artist {
   id     String  @id @default(uuid())
   name   String
   grammy Boolean
-  // albums Album[]
+  albums Album[]
 }

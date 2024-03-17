@@ -56,8 +56,12 @@ export class ArtistService {
     return artist;
   }
 
-  remove(id: string) {
-    this.findArtist(id);
+  async remove(id: string) {
+    await this.findArtist(id);
+    await db.album.updateMany({
+      where: { artistId: id },
+      data: { artistId: null },
+    });
     db.artist.delete({
       where: { id },
     });
@@ -78,5 +82,9 @@ export class ArtistService {
         'Artist with the provided id does not exist.',
       );
     return artist;
+  }
+
+  async filterByIds (id) {
+    return await db.album.findMany()
   }
 }

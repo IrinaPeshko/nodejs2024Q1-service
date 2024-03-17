@@ -11,6 +11,7 @@ import { Album } from './entities/album.entity';
 import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
 import { FavsService } from '../favs/favs.service';
 import { TrackService } from '../track/track.service';
+import { db } from 'src/services/db';
 
 @Injectable()
 export class AlbumService {
@@ -20,47 +21,34 @@ export class AlbumService {
     @Inject(forwardRef(() => TrackService))
     private trackService: TrackService,
   ) {}
-  private albums: Album[] = [];
-  create(createAlbumDto: CreateAlbumDto) {
+
+  async create(createAlbumDto: CreateAlbumDto) {
     const { name, year, artistId } = createAlbumDto;
     if (!name || !year) {
       throw new BadRequestException(
         'Missing required fields. Please ensure all required fields are provided',
       );
     }
-    const newAlbum = new Album();
-    newAlbum.id = uuidv4();
-    newAlbum.name = name;
-    newAlbum.year = year;
-    if (uuidValidate(artistId)) {
-      newAlbum.artistId = artistId;
-    } else {
-      newAlbum.artistId = null;
-    }
-    this.albums.push(newAlbum);
+    const newAlbum = await db.album.create({
+      data: {
+        name,
+        year,
+        artistId: artistId ?? null,
+      },
+    });
     return newAlbum;
   }
 
-  findAll() {
-    return this.albums;
+  async findAll() {
+    return await db.album.findMany();
   }
 
-  findOne(id: string) {
-    if (!uuidValidate(id)) {
-      throw new BadRequestException(
-        'Invalid albumId provided. Please provide a valid UUID.',
-      );
-    }
-    const album = this.albums.find((album) => album.id === id);
-    if (!album)
-      throw new NotFoundException('Album with the provided id does not exist.');
-    return album;
+  async findOne(id: string) {
+    return await this.findAlbum(id);
   }
 
-  update(id: string, updateAlbumDto: UpdateAlbumDto) {
-    const updateAlbumIndex = this.findIndex(id);
-    const album = this.albums[updateAlbumIndex];
-
+  async update(id: string, updateAlbumDto: UpdateAlbumDto) {
+    this.findAlbum(id);
     const { name, year, artistId } = updateAlbumDto;
 
     if (
@@ -72,51 +60,39 @@ export class AlbumService {
         'Invalid fields provided. Please provide a valid data.',
       );
     }
-    const updatedAlbum: Album = {
-      ...album,
-      name: name ? name : album.name,
-      year: year ? year : album.year,
-      artistId: uuidValidate(id)
-        ? artistId
-        : album.artistId
-        ? album.artistId
-        : null,
-    };
-    this.albums[updateAlbumIndex] = updatedAlbum;
+    const updatedAlbum: Album = await db.album.update({
+      where: {id},
+      data: {
+        name: name ?? undefined,
+        year: year ?? undefined,
+        artistId: artistId ?? null,
+      }
+    })
     return updatedAlbum;
   }
 
-  removeArtistId(artistId: string) {
-    const albumsWithArtist = this.albums.filter(
-      (album) => album.artistId === artistId,
-    );
-    albumsWithArtist.map((album) => {
-      const updateAlbumIndex = this.findIndex(album.id);
-      this.albums[updateAlbumIndex] = { ...album, artistId: null };
-    });
-  }
-
-  remove(id: string) {
-    const albumIndex = this.findIndex(id);
-    this.favsService.removeAlbum(id);
-    this.trackService.removeAlbumId(id);
-    this.albums.splice(albumIndex, 1);
+  async remove(id: string) {
+    this.findAlbum(id)
+    await db.album.delete({
+      where: {id}
+    })
     return `Deleted successfully`;
   }
 
-  private findIndex(id: string) {
+  async findAlbum(id: string) {
     if (!uuidValidate(id)) {
       throw new BadRequestException(
         'Invalid albumId provided. Please provide a valid UUID.',
       );
     }
-
-    const albumIndex = this.albums.findIndex((album) => album.id === id);
-    if (albumIndex === -1)
+    const album = await db.album.findUnique({
+      where: { id },
+    });
+    if (!album)
       throw new NotFoundException('Album with the provided id does not exist.');
-    return albumIndex;
+    return album;
   }
-  filterByIds(ids: string[]) {
-    return this.albums.filter((album) => ids.includes(album.id));
+  filterByIds (id) {
+    return db.album.findMany()
   }
 }
