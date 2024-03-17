@@ -1,66 +1,43 @@
 import {
   BadRequestException,
-  Inject,
   Injectable,
   NotFoundException,
-  forwardRef,
 } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
-import { Artist } from './entities/artist.entity';
-import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
-import { FavsService } from '../favs/favs.service';
-import { TrackService } from '../track/track.service';
-import { AlbumService } from '../album/album.service';
+import { validate as uuidValidate } from 'uuid';
+
+import { db } from 'src/services/db';
 
 @Injectable()
 export class ArtistService {
-  constructor(
-    @Inject(forwardRef(() => FavsService))
-    private favsService: FavsService,
-    @Inject(forwardRef(() => TrackService))
-    private trackService: TrackService,
-    @Inject(forwardRef(() => AlbumService))
-    private albumSevice: TrackService,
-  ) {}
-  private artists: Artist[] = [];
-  create(createArtistDto: CreateArtistDto) {
+  async create(createArtistDto: CreateArtistDto) {
     const { name, grammy } = createArtistDto;
     if (!name || !grammy) {
       throw new BadRequestException(
         'Missing required fields. Please ensure all required fields are provided',
       );
     }
-    const newArtist = new Artist();
-    newArtist.id = uuidv4();
-    newArtist.name = name;
-    newArtist.grammy = grammy;
-    this.artists.push(newArtist);
+    const newArtist = await db.artist.create({
+      data: {
+        name,
+        grammy,
+      },
+    });
     return newArtist;
   }
 
-  findAll() {
-    return this.artists;
+  async findAll() {
+    return await db.artist.findMany();
   }
 
-  findOne(id: string) {
-    if (!uuidValidate(id)) {
-      throw new BadRequestException(
-        'Invalid artistId provided. Please provide a valid UUID.',
-      );
-    }
-    const artist = this.artists.find((artist) => artist.id === id);
-    if (!artist)
-      throw new NotFoundException(
-        'artist with the provided id does not exist.',
-      );
+  async findOne(id: string) {
+    const artist = await this.findArtist(id);
     return artist;
   }
 
-  update(id: string, updateArtistDto: UpdateArtistDto) {
-    const updateArtistIndex = this.findIndex(id);
-    const artist = this.artists[updateArtistIndex];
-
+  async update(id: string, updateArtistDto: UpdateArtistDto) {
+    this.findArtist(id);
     const { name, grammy } = updateArtistDto;
 
     if ((name && typeof name !== 'string') || typeof grammy !== 'boolean') {
@@ -68,39 +45,38 @@ export class ArtistService {
         'Invalid name or duration provided. Please provide a valid data.',
       );
     }
-    const updatedArtist: Artist = {
-      ...artist,
-      name: name ? name : artist.name,
-      grammy: grammy ? grammy : false,
-    };
-    this.artists[updateArtistIndex] = updatedArtist;
-    return updatedArtist;
+
+    const artist = await db.artist.update({
+      where: { id },
+      data: {
+        name,
+        grammy,
+      },
+    });
+    return artist;
   }
 
   remove(id: string) {
-    const artistIndex = this.findIndex(id);
-    this.favsService.removeArtist(id);
-    this.trackService.removeArtistId(id);
-    this.albumSevice.removeArtistId(id);
-    this.artists.splice(artistIndex, 1);
+    this.findArtist(id);
+    db.artist.delete({
+      where: { id },
+    });
     return `Delelted successfully`;
   }
 
-  private findIndex(id: string) {
+  async findArtist(id: string) {
     if (!uuidValidate(id)) {
       throw new BadRequestException(
         'Invalid artistId provided. Please provide a valid UUID.',
       );
     }
-    const artistIndex = this.artists.findIndex((artist) => artist.id === id);
-    if (artistIndex === -1)
+    const artist = await db.artist.findUnique({
+      where: { id },
+    });
+    if (!artist)
       throw new NotFoundException(
         'Artist with the provided id does not exist.',
       );
-    return artistIndex;
-  }
-
-  filterByIds(ids: string[]) {
-    return this.artists.filter((artist) => ids.includes(artist.id));
+    return artist;
   }
 }
