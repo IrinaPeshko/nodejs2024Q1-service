@@ -73,6 +73,10 @@ export class AlbumService {
 
   async remove(id: string) {
     this.findAlbum(id)
+    await db.track.updateMany({
+      where: {albumId: id},
+      data: {albumId: null}
+    })
     await db.album.delete({
       where: {id}
     })
@@ -91,8 +95,5 @@ export class AlbumService {
     if (!album)
       throw new NotFoundException('Album with the provided id does not exist.');
     return album;
-  }
-  filterByIds (id) {
-    return db.album.findMany()
   }
 }
