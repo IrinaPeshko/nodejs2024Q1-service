@@ -8,7 +8,7 @@ import {
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { Album } from './entities/album.entity';
-import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
+import { validate as uuidValidate } from 'uuid';
 import { FavsService } from '../favs/favs.service';
 import { TrackService } from '../track/track.service';
 import { db } from 'src/services/db';
@@ -48,7 +48,7 @@ export class AlbumService {
   }
 
   async update(id: string, updateAlbumDto: UpdateAlbumDto) {
-    this.findAlbum(id);
+    await this.findAlbum(id);
     const { name, year, artistId } = updateAlbumDto;
 
     if (
@@ -72,11 +72,12 @@ export class AlbumService {
   }
 
   async remove(id: string) {
-    this.findAlbum(id)
+    await this.findAlbum(id)
     await db.track.updateMany({
       where: {albumId: id},
       data: {albumId: null}
     })
+    await this.favsService.removeAlbum(id)
     await db.album.delete({
       where: {id}
     })

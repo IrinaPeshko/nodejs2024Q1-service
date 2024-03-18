@@ -37,7 +37,7 @@ export class ArtistService {
   }
 
   async update(id: string, updateArtistDto: UpdateArtistDto) {
-    this.findArtist(id);
+    await this.findArtist(id);
     const { name, grammy } = updateArtistDto;
 
     if ((name && typeof name !== 'string') || typeof grammy !== 'boolean') {
@@ -66,7 +66,25 @@ export class ArtistService {
       where: {artistId: id},
       data: {artistId: null}
     })
-    db.artist.delete({
+    
+      const favoriteId = "fixed-favorite-id";
+      const favorite = await db.favorite.findUnique({
+        where: {
+          id: favoriteId,
+        }
+      });
+      if (favorite) {
+        const updatedArtists = favorite.artists.filter(id => id !== id);
+         await db.favorite.update({
+          where: {
+            id: favoriteId,
+          },
+          data: {
+            albums: updatedArtists,
+          }
+        });
+      }
+   await db.artist.delete({
       where: { id },
     });
     return `Delelted successfully`;
