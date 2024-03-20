@@ -1,16 +1,23 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { validate as uuidValidate } from 'uuid';
 
 import { db } from 'src/services/db';
+import { FavsService } from '../favs/favs.service';
 
 @Injectable()
 export class ArtistService {
+  constructor(
+    @Inject(forwardRef(() => FavsService))
+    private favsService: FavsService,
+  ) {}
   async create(createArtistDto: CreateArtistDto) {
     const { name, grammy } = createArtistDto;
     if (!name || !grammy) {
@@ -67,23 +74,7 @@ export class ArtistService {
       data: {artistId: null}
     })
     
-      const favoriteId = "fixed-favorite-id";
-      const favorite = await db.favorite.findUnique({
-        where: {
-          id: favoriteId,
-        }
-      });
-      if (favorite) {
-        const updatedArtists = favorite.artists.filter(id => id !== id);
-         await db.favorite.update({
-          where: {
-            id: favoriteId,
-          },
-          data: {
-            albums: updatedArtists,
-          }
-        });
-      }
+    await this.favsService.removeArtist(id, "artist")
    await db.artist.delete({
       where: { id },
     });

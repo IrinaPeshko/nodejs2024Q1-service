@@ -70,6 +70,7 @@ export class TrackService {
 
   async remove(id: string) {
     await this.findTrack(id)
+    this.favsService.removeTrack(id, "track")
     await db.track.delete({
       where: {id}
     })

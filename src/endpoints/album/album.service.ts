@@ -10,7 +10,6 @@ import { UpdateAlbumDto } from './dto/update-album.dto';
 import { Album } from './entities/album.entity';
 import { validate as uuidValidate } from 'uuid';
 import { FavsService } from '../favs/favs.service';
-import { TrackService } from '../track/track.service';
 import { db } from 'src/services/db';
 
 @Injectable()
@@ -18,8 +17,6 @@ export class AlbumService {
   constructor(
     @Inject(forwardRef(() => FavsService))
     private favsService: FavsService,
-    @Inject(forwardRef(() => TrackService))
-    private trackService: TrackService,
   ) {}
 
   async create(createAlbumDto: CreateAlbumDto) {
@@ -61,26 +58,26 @@ export class AlbumService {
       );
     }
     const updatedAlbum: Album = await db.album.update({
-      where: {id},
+      where: { id },
       data: {
         name: name ?? undefined,
         year: year ?? undefined,
         artistId: artistId ?? null,
-      }
-    })
+      },
+    });
     return updatedAlbum;
   }
 
   async remove(id: string) {
-    await this.findAlbum(id)
+    await this.findAlbum(id);
     await db.track.updateMany({
-      where: {albumId: id},
-      data: {albumId: null}
-    })
-    await this.favsService.removeAlbum(id)
+      where: { albumId: id },
+      data: { albumId: null },
+    });
+    await this.favsService.removeAlbum(id, 'album');
     await db.album.delete({
-      where: {id}
-    })
+      where: { id },
+    });
     return `Deleted successfully`;
   }
 

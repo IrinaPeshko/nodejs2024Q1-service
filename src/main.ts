@@ -5,7 +5,7 @@ import { readFile } from 'fs/promises';
 import { dirname, join } from 'path';
 import { parse } from 'yaml';
 import * as dotenv from 'dotenv';
-import { db } from './services/db';
+import { initializeFavorite } from './utils/initializeFavorite';
 dotenv.config();
 
 async function bootstrap() {
@@ -18,21 +18,10 @@ async function bootstrap() {
   SwaggerModule.setup('doc', app, parsedDocFile);
   const port = process.env.PORT || 4000;
   await app.listen(port);
-  const FAVORITE_ID = 'fixed-favorite-id';
-  initializeFavorite(FAVORITE_ID);
+  initializeFavorite('albums', 'fixed-favorite-albums-id').catch(console.error);
+  initializeFavorite('artists', 'fixed-favorite-artists-id').catch(
+    console.error,
+  );
+  initializeFavorite('tracks', 'fixed-favorite-tracks-id').catch(console.error);
 }
 bootstrap();
-
-async function initializeFavorite(FAVORITE_ID) {
-  const favoriteExists = await db.favorite.findUnique({
-    where: { id: FAVORITE_ID },
-  });
-
-  if (!favoriteExists) {
-    await db.favorite.create({
-      data: {
-        id: FAVORITE_ID,
-      },
-    });
-  }
-}
