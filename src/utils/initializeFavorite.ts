@@ -35,5 +35,3 @@ export async function initializeFavorite(type, fixedId) {
       throw new Error('Unknown type of favorites');
   }
 }
-
-

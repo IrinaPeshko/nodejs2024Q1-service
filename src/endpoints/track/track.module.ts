@@ -7,6 +7,5 @@ import { FavsModule } from '../favs/favs.module';
   imports: [forwardRef(() => FavsModule)],
   controllers: [TrackController],
   providers: [TrackService],
-  exports: [TrackService],
 })
 export class TrackModule {}

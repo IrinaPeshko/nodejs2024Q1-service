@@ -8,7 +8,7 @@ import {
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { Track } from './entities/track.entity';
-import {validate as uuidValidate } from 'uuid';
+import { validate as uuidValidate } from 'uuid';
 import { FavsService } from '../favs/favs.service';
 import { db } from 'src/services/db';
 
@@ -32,22 +32,22 @@ export class TrackService {
         name,
         duration,
         artistId: artistId ?? null,
-        albumId: albumId ?? null
-      }
-    })
+        albumId: albumId ?? null,
+      },
+    });
     return newTrack;
   }
 
   async findAll() {
-    return db.track.findMany()
+    return db.track.findMany();
   }
 
   async findOne(id: string) {
-    return await this.findTrack(id)
+    return await this.findTrack(id);
   }
 
   async update(id: string, updateTrackDto: UpdateTrackDto) {
-    await this.findTrack(id)
+    await this.findTrack(id);
 
     const { name, artistId, albumId, duration } = updateTrackDto;
 
@@ -57,23 +57,23 @@ export class TrackService {
       );
     }
     const updatedTrack: Track = await db.track.update({
-      where: {id},
+      where: { id },
       data: {
-        name, 
-        duration, 
+        name,
+        duration,
         albumId,
-        artistId
-      }
-    })
+        artistId,
+      },
+    });
     return updatedTrack;
   }
 
   async remove(id: string) {
-    await this.findTrack(id)
-    this.favsService.removeTrack(id, "track")
+    await this.findTrack(id);
+    this.favsService.removeTrack(id, 'track');
     await db.track.delete({
-      where: {id}
-    })
+      where: { id },
+    });
     return `Delelted successfully`;
   }
 
@@ -84,8 +84,8 @@ export class TrackService {
       );
     }
     const track = await db.track.findUnique({
-      where: {id}
-    })
+      where: { id },
+    });
     if (!track)
       throw new NotFoundException('Track with the provided id does not exist.');
     return track;

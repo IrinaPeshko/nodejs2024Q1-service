@@ -70,12 +70,12 @@ export class ArtistService {
       data: { artistId: null },
     });
     await db.track.updateMany({
-      where: {artistId: id},
-      data: {artistId: null}
-    })
-    
-    await this.favsService.removeArtist(id, "artist")
-   await db.artist.delete({
+      where: { artistId: id },
+      data: { artistId: null },
+    });
+
+    await this.favsService.removeArtist(id, 'artist');
+    await db.artist.delete({
       where: { id },
     });
     return `Delelted successfully`;

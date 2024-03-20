@@ -1,35 +1,14 @@
 import {
   BadRequestException,
-  Inject,
   Injectable,
   NotFoundException,
   UnprocessableEntityException,
-  forwardRef,
 } from '@nestjs/common';
 import { validate as uuidValidate } from 'uuid';
-import { TrackService } from '../track/track.service';
-import { AlbumService } from 'src/endpoints/album/album.service';
-import { ArtistService } from '../artist/artist.service';
 import { db } from 'src/services/db';
 
 @Injectable()
 export class FavsService {
-  constructor(
-    @Inject(forwardRef(() => TrackService))
-    private trackService: TrackService,
-
-    @Inject(forwardRef(() => ArtistService))
-    private artistService: ArtistService,
-
-    @Inject(forwardRef(() => AlbumService))
-    private albumService: AlbumService,
-  ) {}
-  private readonly favorites = {
-    tracks: [] as string[],
-    artists: [] as string[],
-    albums: [] as string[],
-  };
-
   async addTrack(id: string) {
     if (!uuidValidate(id)) {
       throw new BadRequestException('Invalid track UUID.');
@@ -138,7 +117,7 @@ export class FavsService {
     return response;
   }
 
-  async removeTrack(trackId: string, mode?: "track") {
+  async removeTrack(trackId: string, mode?: 'track') {
     const favoriteId = 'fixed-favorite-tracks-id';
 
     const favoriteTracks = await db.favoriteTracks.findUnique({
@@ -163,12 +142,12 @@ export class FavsService {
         },
       });
       return 'Deleted successfully';
-    } else if (mode !== "track"){
+    } else if (mode !== 'track') {
       throw new NotFoundException('Track not found in favorites');
     }
   }
 
-  async removeAlbum(albumId: string, mode?: "album") {
+  async removeAlbum(albumId: string, mode?: 'album') {
     const favoriteId = 'fixed-favorite-albums-id';
 
     const favoriteAlbums = await db.favoriteAlbums.findUnique({
@@ -198,7 +177,7 @@ export class FavsService {
     }
   }
 
-  async removeArtist(artistId: string, mode?: "artist") {
+  async removeArtist(artistId: string, mode?: 'artist') {
     const favoriteId = 'fixed-favorite-artists-id';
 
     const favoriteArtists = await db.favoriteArtists.findUnique({
@@ -223,7 +202,7 @@ export class FavsService {
         },
       });
       return 'Deleted successfully';
-    } else if (mode !== "artist") {
+    } else if (mode !== 'artist') {
       throw new NotFoundException('Artist not found in favorites');
     }
   }
