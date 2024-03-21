@@ -1,18 +1,19 @@
-# pull official base image
-FROM node:slim
+FROM node:18-alpine as build
 
-# install openssl to avoid errors in lohs
-RUN apt-get update -y && apt-get install -y openssl
-
-# set working directory
 WORKDIR /app
 
-# set url to connect to the db
+COPY package*.json .
+
 ENV DATABASE_URL="postgresql://admin:root@host.docker.internal:5432/mydb?schema=public"
 
-# build app
-ADD . /app
 RUN npm install
 
-# run migration & start app
-CMD npx prisma migrate dev --name init && npm run start
+COPY . .
+
+FROM node:18-alpine as main
+
+WORKDIR /app
+
+COPY --from=build /app /app
+
+CMD npx prisma migrate dev --name init && npm run start:dev
