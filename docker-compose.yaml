@@ -9,6 +9,8 @@ services:
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=root
+    volumes:
+      - db-data:/var/lib/postgresql/data
     restart: always
     healthcheck:
       test: [ 'CMD-SHELL', 'pg_isready -U admin' ]
@@ -28,8 +30,14 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      - app-logs:/app/logs
 
 networks:
   backend:
     name: backend
     driver: bridge
+
+volumes:
+  db-data:
+  app-logs:
