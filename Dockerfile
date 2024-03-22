@@ -4,8 +4,6 @@ WORKDIR /app
 
 COPY package*.json .
 
-ENV DATABASE_URL="postgresql://admin:root@host.docker.internal:5432/mydb?schema=public"
-
 RUN npm install
 
 COPY . .
