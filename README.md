@@ -47,7 +47,7 @@ git clone https://github.com/IrinaPeshko/nodejs2024Q1-service.git
     Use Docker Compose to start the application:
 
     ```sh
-    npm run docker
+    docker-compose up
     ```
 
     This command builds the Docker images and starts the services defined in `docker-compose.yml`.
@@ -56,16 +56,21 @@ git clone https://github.com/IrinaPeshko/nodejs2024Q1-service.git
 
     Once the application is running, you can access it at `http://localhost:4000`. Adjust the port if you have changed the `PORT` environment variable in your `.env` file.
 
-### Accessing the Database
+### Docker Security Scanning
 
-1. **Connect to PostgreSQL**
+Use the following npm scripts to scan Docker images for vulnerabilities:
 
-    Connect to your PostgreSQL database using the credentials provided in the `.env` file. You can use a database tool like pgAdmin or a command-line tool like psql.
+- Scan the application image:
+  
+  ```sh
+  npm run docker-scan:app
+'''
 
-### Making Changes
-
-- When you make changes to the application code, the changes will be reflected automatically thanks to the bind mount setup in `docker-compose.yml`.
-- For database schema changes, use Prisma migrations.
+  - Scan the database image:
+  
+  ```sh
+  npm run docker-scan:db
+  ```
 
 ### Stopping the Application
 
@@ -118,24 +123,10 @@ npm run lint
 npm run format
 ```
 
-### Debugging in VSCode
 
-Press <kbd>F5</kbd> to debug.
-
-For more information, visit: https://code.visualstudio.com/docs/editor/debugging
-
-## Additional Setup Instructions
-
-### Creating `.env` File
-Before running the application, ensure you have a `.env` file set up in your project root. You can create this file by copying the `.env.example` provided in the repository and modifying it to suit your environment.
 
 ### Running Tests in a Separate Terminal
 Tests are an essential part of this application. To run tests while the application is running, open a new terminal window and execute the test commands. This allows you to run tests without interrupting the application's runtime.
 
 ### OpenAPI Documentation
 The application is documented using OpenAPI. You can access the documentation by navigating to `http://localhost:4000/doc/` in your web browser after starting the application.
-
-### Debugging
-For debugging in Visual Studio Code, you can use the integrated debugger. Just press <kbd>F5</kbd> to start debugging.
-
-Remember to check the `package.json` file for other scripts that might be useful in development or production environments.
