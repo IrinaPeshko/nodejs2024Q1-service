@@ -1,0 +1,44 @@
+services:
+  db:
+    image: postgres:bullseye
+    container_name: db
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+    ports: 
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    networks:
+      - backend
+    restart: always
+    volumes:
+      - data:/var/lib/postgresql/data
+      - logs:/var/log/postgresql
+    healthcheck:
+      test: [ 'CMD-SHELL', 'pg_isready -U admin' ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  app:
+    build: .
+    restart: always
+    container_name: app
+    environment:
+      - PORT=${PORT}
+      - DATABASE_URL=${DATABASE_URL}
+    ports: 
+      - ${PORT}:${PORT}
+    networks:
+      - backend
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src
+volumes:
+  data:
+  logs:
+networks:
+  backend:
+    name: backend
+    driver: bridge

@@ -1,10 +1,12 @@
 # compiled output
 /dist
+/data
 /node_modules
 
 # Logs
 logs
 *.log
+*.env
 npm-debug.log*
 pnpm-debug.log*
 yarn-debug.log*
